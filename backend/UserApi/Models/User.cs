@@ -1,4 +1,6 @@
-﻿namespace UserApi.Models
+﻿using UserApi.Enums;
+
+namespace UserApi.Models
 {
     public class User
     {
@@ -7,6 +9,6 @@
         public string LastName { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public string UserType { get; set; }
+        public UserType UserType { get; set; }
     }
 }
