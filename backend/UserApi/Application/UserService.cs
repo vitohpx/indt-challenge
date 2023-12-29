@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using UserApi.Models;
-using UserApi.Infrastructure;
+﻿using UserApi.Models;
 using UserManager.Infrastructure;
 
 namespace UserApi.Application
@@ -22,6 +20,11 @@ namespace UserApi.Application
         public User GetUserById(int id)
         {
             return _userRepository.GetUserById(id);
+        }
+
+        public User GetUserByEmail(string email)
+        {
+            return _userRepository.GetUserByEmail(email);
         }
 
         public void AddUser(User user)
