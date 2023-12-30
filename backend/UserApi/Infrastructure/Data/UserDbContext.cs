@@ -37,7 +37,7 @@ namespace UserApi.Infrastructure.Data
                         LastName = "Type",
                         Email = "adm@test.com",
                         Password = "adm123",
-                        UserType = Enums.UserType.Admin
+                        UserType = (int)Enums.UserType.Admin
                     };
                     userManager.AddUser(adminUser);
                 }

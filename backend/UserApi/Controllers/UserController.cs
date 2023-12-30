@@ -45,7 +45,7 @@ namespace UserApi.Controllers
                 LastName = userDTO.LastName,
                 Email = userDTO.Email,
                 Password = userDTO.Password,
-                UserType = Enum.Parse<UserType>(userDTO.UserType) 
+                UserType = userDTO.UserType
             };
 
             _userService.AddUser(user);
@@ -67,7 +67,7 @@ namespace UserApi.Controllers
             existingUser.LastName = userDTO.LastName;
             existingUser.Email = userDTO.Email;
             existingUser.Password = userDTO.Password;
-            existingUser.UserType = Enum.Parse<UserType>(userDTO.UserType);
+            existingUser.UserType = userDTO.UserType;
 
             _userService.UpdateUser(existingUser);
 
