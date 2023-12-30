@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Table, Button, Form } from 'react-bootstrap';
 import { getUserList, deleteUser, updateUser } from '../../services/user.service';
 
 enum UserType {
@@ -19,6 +20,17 @@ const UserPortal: React.FC = () => {
     const [editUser, setEditUser] = useState<User | null>(null);
 
     const userType: UserType = UserType.Common;
+
+    const userTypeToString = (userType: UserType): string => {
+        switch (userType) {
+          case UserType.Admin:
+            return 'Admin';
+          case UserType.Common:
+            return 'Common';
+          default:
+            return '';
+        }
+    };
 
     useEffect(() => {
         fetchUsers();
@@ -65,8 +77,87 @@ const UserPortal: React.FC = () => {
     };
 
     return (
-        <div>
-        </div>
+    <div>
+      <h2>User List</h2>
+      <Table bordered>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>User Type</th> 
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map((user: User) => (
+            <tr key={user.id}>
+              <td>{user.id}</td>
+              <td>
+                {editUser && editUser.id === user.id ? (
+                  <Form.Control
+                    type="text"
+                    name="firstName"
+                    value={editUser.firstName}
+                    onChange={handleChange}
+                  />
+                ) : (
+                  user.firstName
+                )}
+              </td>
+              <td>
+                {editUser && editUser.id === user.id ? (
+                  <Form.Control
+                    type="text"
+                    name="lastName"
+                    value={editUser.lastName}
+                    onChange={handleChange}
+                  />
+                ) : (
+                  user.lastName
+                )}
+              </td>
+              <td>
+                {editUser && editUser.id === user.id ? (
+                  <Form.Control
+                    type="text"
+                    name="email"
+                    value={editUser.email}
+                    onChange={handleChange}
+                  />
+                ) : (
+                  user.email
+                )}
+              </td>
+              {user.userType === UserType.Admin && (
+                <td>{userTypeToString(user.userType)}</td>
+              )}
+              <td>
+                <Button variant="info" onClick={() => handleEdit(user)}>
+                  Edit
+                </Button>
+                {user.userType === UserType.Admin && (
+                  <Button variant="danger" onClick={() => handleDelete(user.id)}>
+                    Delete
+                  </Button>
+                )}
+                {editUser && editUser.id === user.id && (
+                  <>
+                    <Button variant="success" onClick={() => handleUpdate(user.id, editUser)}>
+                      Update
+                    </Button>
+                    <Button variant="danger" onClick={handleCancelEdit}>
+                      Cancel
+                    </Button>
+                  </>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    </div>
     );
 };
 
