@@ -7,6 +7,7 @@ export const login = async (credentials: { email: string; password: string }) =>
 
         sessionStorage.setItem('token', token);
         sessionStorage.setItem('userType', user.userType);
+        sessionStorage.setItem('userCommon', user.id);
         return token;
     } catch (error) {
         throw error;

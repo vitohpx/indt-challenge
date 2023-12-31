@@ -40,3 +40,23 @@
 .read-the-docs {
   color: #888;
 }
+
+.password-input {
+  position: relative;
+}
+
+.password-toggle-button {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  background-color: transparent;
+  transform: translateY(-50%);
+}
+
+.text-white {
+  color: white;
+}
+
+.gray-background {
+  background-color: red;
+}

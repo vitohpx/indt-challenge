@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Form, Alert, Modal} from 'react-bootstrap';
-import { getUserList, addUser, deleteUser, updateUser } from '../../services/user.service';
+import { getUserList, addUser, deleteUser, updateUser, getUserById } from '../../services/user.service';
 import { UserType, userTypeToString } from '../../utils/userType';
+import { FaEye, FaEyeSlash, FaCheck, FaTimes, FaTrashAlt, FaEdit} from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
 interface User {
@@ -29,6 +30,10 @@ const UserPortal: React.FC = () => {
     });
     const [editingUserId, setEditingUserId] = useState<number | null>(null);
     const navigate = useNavigate();
+    const userType = sessionStorage.getItem('userType');
+    const isAdmin = userType === UserType.Admin.toString();
+    const isCommon = sessionStorage.getItem('userCommon');
+    const [showPassword, setShowPassword] = useState(false);
 
     useEffect(() => {
         fetchUsers();
@@ -36,7 +41,15 @@ const UserPortal: React.FC = () => {
 
     const fetchUsers = async () => {
         const userList = await getUserList();
-        setUsers(userList);
+        if (isAdmin){
+            setUsers(userList);
+        }
+        else{
+            if (isCommon) {
+                const userCommon = await getUserById(parseInt(isCommon));
+                setUsers([userCommon]);
+            }
+        }
     };
 
     const handleDelete = async (id: number) => {
@@ -125,7 +138,7 @@ const UserPortal: React.FC = () => {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
         <div>
-          <Button variant="danger" onClick={handleLogout}>
+          <Button variant="secondary" onClick={handleLogout}>
             Logout
           </Button>
         </div>
@@ -145,10 +158,12 @@ const UserPortal: React.FC = () => {
           Usuário removido com sucesso!
         </Alert>
       )}
-      <h2>User Portal</h2>
-      <Button variant="primary" onClick={() => setShowCreateModal(true)}>
-        Create User
-      </Button>
+      <h2 className="text-white">User Portal</h2>
+        {isAdmin && (
+            <Button variant="primary" onClick={() => setShowCreateModal(true)} className="mb-3">
+                Create User
+            </Button>
+        )}
       <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Create User</Modal.Title>
@@ -156,20 +171,20 @@ const UserPortal: React.FC = () => {
         <Modal.Body>
           <Form>
             <Form.Group controlId="formFirstName">
-              <Form.Label>First Name</Form.Label>
+              <Form.Label>Primeiro Nome</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Enter first name"
+                placeholder="Primeiro Nome"
                 value={newUser.firstName}
                 onChange={(e) => setNewUser({ ...newUser, firstName: e.target.value })}
                 required
               />
             </Form.Group>
             <Form.Group controlId="formLastName">
-              <Form.Label>Last Name</Form.Label>
+              <Form.Label>Último Nome</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Enter last name"
+                placeholder="Último Nome"
                 value={newUser.lastName}
                 onChange={(e) => setNewUser({ ...newUser, lastName: e.target.value })}
                 required
@@ -179,17 +194,17 @@ const UserPortal: React.FC = () => {
               <Form.Label>Email</Form.Label>
               <Form.Control
                 type="email"
-                placeholder="Enter email"
+                placeholder="example@test.com"
                 value={newUser.email}
                 onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
                 required
               />
             </Form.Group>
             <Form.Group controlId="formPassword">
-              <Form.Label>Password</Form.Label>
+              <Form.Label>Senha</Form.Label>
               <Form.Control
                 type="password"
-                placeholder="Enter password"
+                placeholder="Senha"
                 value={newUser.password}
                 onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
                 required
@@ -198,6 +213,7 @@ const UserPortal: React.FC = () => {
             <Form.Group controlId="formUserType">
               <Form.Label>User Type</Form.Label>
               <Form.Control
+                className="form-select"
                 as="select"
                 value={newUser.userType}
                 onChange={(e) => setNewUser({ ...newUser, userType: Number(e.target.value) })}
@@ -217,14 +233,15 @@ const UserPortal: React.FC = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-      <Table bordered>
+      <Table bordered className="mb-3 table-secondary">
         <thead>
           <tr>
             <th>ID</th>
             <th>First Name</th>
             <th>Last Name</th>
             <th>Email</th>
-            <th>User Type</th> 
+            <th>Senha</th>
+            {isAdmin && (<th>User Type</th> )}
             <th>Actions</th>
           </tr>
         </thead>
@@ -269,36 +286,67 @@ const UserPortal: React.FC = () => {
                         )}
                     </td>
                     <td>
-                        {editUser && editUser.id === user.id ? (
-                            <Form.Control as="select" name="userType" value={editUser?.userType} onChange={handleUserTypeChange}>
-                                <option value={UserType.Admin}>{userTypeToString(UserType.Admin)}</option>
-                                <option value={UserType.Common}>{userTypeToString(UserType.Common)}</option>
-                            </Form.Control>
-                        ) : (
-                                userTypeToString(user.userType)
-                            )}
+                        {isCommon && parseInt(isCommon) === user.id && editingUserId === user.id ? (
+                            <div className="password-input">
+                                <Form.Control
+                                type={showPassword ? 'text' : 'password'}
+                                name="password"
+                                value={editUser?.password}
+                                onChange={handleChange}
+                                />
+                                <Button
+                                variant="outline-secondary no-hover border-0"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="password-toggle-button"
+                                >
+                                {showPassword ?  <FaEye /> : <FaEyeSlash /> }
+                                </Button>
+                            </div>
+                            ) : (
+                           <strong>**********</strong>
+                        )}
                     </td>
-                    <td>
-                        {editingUserId === user.id ? (
-                        <>
-                            <Button variant="success" onClick={() => handleUpdate(user.id, editUser)}>
-                            Update
-                            </Button>
-                            <Button variant="danger" onClick={handleCancelEdit}>
-                            Cancel
-                            </Button>
-                        </>
-                        ) : (
-                        <>
-                            <Button variant="info" onClick={() => handleEdit(user)}>
-                            Edit
-                            </Button>
-                            {user.userType === UserType.Admin && (
-                            <Button variant="danger" onClick={() => handleDelete(user.id)}>
-                                Delete
-                            </Button>
+                    {isAdmin && (
+                        <td>
+                            {editUser && editUser.id === user.id ? (
+                                <div className="custom-dropdown-wrapper">
+                                <Form.Control
+                                    className="form-select"
+                                    as="select"
+                                    name="userType"
+                                    value={editUser?.userType}
+                                    onChange={handleUserTypeChange}
+                                >
+                                    <option value={UserType.Admin}>{userTypeToString(UserType.Admin)}</option>
+                                    <option value={UserType.Common}>{userTypeToString(UserType.Common)}</option>
+                                </Form.Control>
+                                </div>
+                            ) : (
+                            userTypeToString(user.userType)
                             )}
-                        </>
+                        </td>
+                    )}
+                   <td className="action-buttons">
+                        {editingUserId === user.id ? (
+                            <>
+                            <Button variant="outline-success border-0" onClick={() => handleUpdate(user.id, editUser)}>
+                                <FaCheck /> 
+                            </Button>
+                            <Button variant="outline-danger border-0" onClick={handleCancelEdit}>
+                                <FaTimes /> 
+                            </Button>
+                            </>
+                        ) : (
+                            <>
+                            <Button variant="outline-secondary border-0" onClick={() => handleEdit(user)}>
+                                <FaEdit /> 
+                            </Button>
+                            {isAdmin && (
+                                <Button variant="outline-danger border-0" onClick={() => handleDelete(user.id)} className="ml-2">
+                                    <FaTrashAlt /> 
+                                </Button>
+                            )}
+                            </>
                         )}
                     </td>
                 </tr>

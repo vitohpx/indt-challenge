@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../services/login.service';
 import { Modal, Button, Form, Alert } from 'react-bootstrap';
-import { UserType, userTypeToString } from '../utils/userType';
+import { UserType } from '../utils/userType';
 import { addUser } from '../services/user.service';
 
 const Login: React.FC = () => {
@@ -67,6 +67,8 @@ const Login: React.FC = () => {
         setTimeout(() => {
           setCreateShowAlert(false);
         }, 5000);
+        setEmail('');
+        setPassword('');
       } catch (error) {
         console.error('Erro ao criar usuário:', error);
       }
@@ -83,37 +85,39 @@ const Login: React.FC = () => {
             )}
             {showLoginAlert && (
                     <Alert variant="danger" onClose={() => setLoginShowAlert(false)} dismissible>
-                    Usuário inválido ou não cadastrado. Cadastre-se ou entre em contato com algum Administrador para recuperar seu acesso.
+                    Usuário ou senha inválidos. Entre em contato com o Administrador.
                     </Alert>
             )}  
-            <h2>Login</h2>
+            <img src="/indt_logo.png" alt="Logo" style={{ width: '30%', marginBottom: '20px' }} />
             <Form>
-                <Form.Group controlId="formEmail">
-                <Form.Label>Email</Form.Label>
+                <Form.Group controlId="formEmail" className="mb-3">
+                <Form.Label className="text-white">Email</Form.Label>
                 <Form.Control
                     required
                     type="email"
-                    placeholder="Enter email"
+                    placeholder="Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
                 </Form.Group>
-                <Form.Group controlId="formPassword">
-                <Form.Label>Password</Form.Label>
+
+                <Form.Group controlId="formPassword" className="mb-3">
+                <Form.Label className="text-white">Senha</Form.Label>
                 <Form.Control
                     type="password"
-                    placeholder="Enter password"
+                    placeholder="Senha"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
                 </Form.Group>
-                <Button variant="primary" onClick={handleLogin}>
-                Login
+
+                <Button variant="primary" onClick={handleLogin} className="mt-3">
+                    Login
                 </Button>
             </Form>
 
-            <p>
+            <p className="text-white">
                 Não tem conta?{' '}
                 <a href="#" onClick={handleShowRegisterModal}>
                 Cadastre-se
@@ -127,20 +131,20 @@ const Login: React.FC = () => {
                 <Modal.Body>
                 <Form>
                     <Form.Group controlId="formFirstName">
-                        <Form.Label>First Name</Form.Label>
+                        <Form.Label>Primeiro Nome</Form.Label>
                         <Form.Control
                             type="text"
-                            placeholder="Enter first name"
+                            placeholder="Primeiro Nome"
                             value={newUser.firstName}
                             onChange={(e) => setNewUser({ ...newUser, firstName: e.target.value })}
                             required
                         />
                         </Form.Group>
                         <Form.Group controlId="formLastName">
-                        <Form.Label>Last Name</Form.Label>
+                        <Form.Label>Último Nome</Form.Label>
                         <Form.Control
                             type="text"
-                            placeholder="Enter last name"
+                            placeholder="Último Nome"
                             value={newUser.lastName}
                             onChange={(e) => setNewUser({ ...newUser, lastName: e.target.value })}
                             required
@@ -150,41 +154,30 @@ const Login: React.FC = () => {
                         <Form.Label>Email</Form.Label>
                         <Form.Control
                             type="email"
-                            placeholder="Enter email"
+                            placeholder="exemplo@test.com"
                             value={newUser.email}
                             onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
                             required
                         />
                         </Form.Group>
                         <Form.Group controlId="formPassword">
-                        <Form.Label>Password</Form.Label>
+                        <Form.Label>Senha</Form.Label>
                         <Form.Control
                             type="password"
-                            placeholder="Enter password"
+                            placeholder="Senha"
                             value={newUser.password}
                             onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
                             required
                         />
                     </Form.Group>
-                    <Form.Group controlId="formUserType">
-                    <Form.Label>User Type</Form.Label>
-                    <Form.Control
-                        as="select"
-                        value={newUser.userType}
-                        onChange={(e) => setNewUser({ ...newUser, userType: Number(e.target.value) })}
-                    >
-                        <option value={UserType.Admin}>{userTypeToString(UserType.Admin)}</option>
-                        <option value={UserType.Common}>{userTypeToString(UserType.Common)}</option>
-                    </Form.Control>
-                    </Form.Group>
                 </Form>
                 </Modal.Body>
                 <Modal.Footer>
                 <Button variant="secondary" onClick={handleCloseRegisterModal}>
-                    Close
+                    Cancelar
                 </Button>
                 <Button variant="primary" onClick={handleRegister}>
-                    Register
+                    Criar
                 </Button>
                 </Modal.Footer>
             </Modal>
