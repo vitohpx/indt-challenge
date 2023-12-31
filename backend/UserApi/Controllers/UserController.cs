@@ -39,6 +39,11 @@ namespace UserApi.Controllers
         [HttpPost]
         public ActionResult<User> PostUsers([FromBody] UserDTO userDTO)
         {
+            if (_userService.IsEmailInUse(userDTO.Email))
+            {
+                return BadRequest("E-mail já em uso");
+            }
+
             var user = new User
             {
                 FirstName = userDTO.FirstName,
@@ -63,6 +68,11 @@ namespace UserApi.Controllers
                 return NotFound();
             }
 
+            if (_userService.IsEmailInUse(userDTO.Email, id))
+            {
+                return BadRequest("E-mail já em uso");
+            }
+
             existingUser.FirstName = userDTO.FirstName;
             existingUser.LastName = userDTO.LastName;
             existingUser.Email = userDTO.Email;
@@ -73,6 +83,7 @@ namespace UserApi.Controllers
 
             return NoContent();
         }
+
 
         [HttpDelete("{id}")]
         public IActionResult DeleteUsers(int id)

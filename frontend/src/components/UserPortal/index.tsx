@@ -70,25 +70,40 @@ const UserPortal: React.FC = () => {
         setEditUser(null);
         setEditingUserId(null);
     };
+
+    
+    const isEmailValid = (email: string) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
     
 
     const handleUpdate = async (id: number, updatedUser: User | null) => {
-        if (updatedUser) {
-            const updatedFields = {
-            firstName: updatedUser.firstName,
-            lastName: updatedUser.lastName,
-            email: updatedUser.email,
-            password: updatedUser.password,
-            userType: updatedUser.userType
-            };
-            await updateUser(id, updatedFields);
-            setEditShowAlert(true);
-            setTimeout(() => {
-            setEditShowAlert(false);
-            }, 3000);
-            setEditUser(null);
-            setEditingUserId(null);
-            fetchUsers();
+        try {
+            if (updatedUser) {
+                if (!isEmailValid(updatedUser.email)) {
+                    alert('Por favor, insira um e-mail válido.');
+                    return;
+                }
+                const updatedFields = {
+                firstName: updatedUser.firstName,
+                lastName: updatedUser.lastName,
+                email: updatedUser.email,
+                password: updatedUser.password,
+                userType: updatedUser.userType
+                };
+                await updateUser(id, updatedFields);
+                setEditShowAlert(true);
+                setTimeout(() => {
+                setEditShowAlert(false);
+                }, 3000);
+                setEditUser(null);
+                setEditingUserId(null);
+                fetchUsers();
+            }
+        }
+        catch (error: any) {
+            alert(`Erro ao criar usuário: ${error.response.data}`);
         }
     };      
     
@@ -110,6 +125,11 @@ const UserPortal: React.FC = () => {
                 alert('Todos os campos são obrigatórios.');
                 return;
             }
+            if (!isEmailValid(newUser.email)) {
+                alert('Por favor, insira um e-mail válido.');
+                return;
+            }
+    
             await addUser(newUser);
             setCreateShowAlert(true);
             setTimeout(() => {
@@ -124,8 +144,8 @@ const UserPortal: React.FC = () => {
                 userType: UserType.Common,
             });
             fetchUsers();
-        } catch (error) {
-          console.error('Erro ao criar usuário:', error);
+        } catch (error: any) {
+            alert(`Erro ao criar usuário: ${error.response.data}`);
         }
     };
 

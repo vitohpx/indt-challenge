@@ -49,10 +49,20 @@ const Login: React.FC = () => {
     });
   };
 
+  const isEmailValid = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleRegister = async () => {
     try {
         if (!newUser.firstName || !newUser.lastName || !newUser.email || !newUser.password) {
             alert('Todos os campos são obrigatórios.');
+            return;
+        }
+
+        if (!isEmailValid(newUser.email)) {
+            alert('Por favor, insira um e-mail válido.');
             return;
         }
         await addUser(newUser);
@@ -69,8 +79,8 @@ const Login: React.FC = () => {
         }, 5000);
         setEmail('');
         setPassword('');
-      } catch (error) {
-        console.error('Erro ao criar usuário:', error);
+      } catch (error: any) {
+        alert(`Erro ao criar usuário: ${error.response.data}`);
       }
     handleCloseRegisterModal();
   };

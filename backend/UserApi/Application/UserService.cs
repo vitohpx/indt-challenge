@@ -41,5 +41,12 @@ namespace UserApi.Application
         {
             _userRepository.DeleteUser(id);
         }
+
+        public bool IsEmailInUse(string email, int? userIdToExclude = null)
+        {
+            var existingUser = GetUserByEmail(email);
+            return existingUser != null && (userIdToExclude == null || existingUser.Id != userIdToExclude);
+        }
+
     }
 }
