@@ -4,6 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using UserApi.Application;
+using UserApi.DTO;
 using UserApi.Models;
 
 namespace UserApi.Controllers
@@ -23,12 +24,13 @@ namespace UserApi.Controllers
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] User loginRequest)
+        public IActionResult Login([FromBody] LoginDTO loginRequest)
         {
             if (IsValidUser(loginRequest))
             {
+                var user = _userService.GetUserByEmail(loginRequest.Email);
                 var token = GenerateToken(loginRequest.Email);
-                return Ok(new { Token = token });
+                return Ok(new { Token = token, User = user});
             }
 
             return Unauthorized();
@@ -36,7 +38,7 @@ namespace UserApi.Controllers
 
         [HttpPost("logout")]
 
-        private bool IsValidUser(User loginRequest)
+        private bool IsValidUser(LoginDTO loginRequest)
         {
 
             var user = _userService.GetUserByEmail(loginRequest.Email);
