@@ -1,16 +1,15 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import {Route, Routes } from 'react-router-dom';
+import Login from './pages';
+import UserPortal from './components/UserPortal'; 
 import './App.css'
-import UserPortal from './components/UserPortal'
 
-function App() {
-
+const App = () => {
   return (
-    <div>
-      <UserPortal></UserPortal>
-    </div>
-  )
-}
+    <Routes>
+        <Route path="/" element={<Login/>} />
+        <Route path="/user-portal" element={<UserPortal/>} />
+    </Routes>
+  );
+};
 
-export default App
+export default App;

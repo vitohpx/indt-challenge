@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Form, Alert, Modal} from 'react-bootstrap';
 import { getUserList, addUser, deleteUser, updateUser } from '../../services/user.service';
-
-enum UserType {
-  Admin = 0,
-  Common = 1,
-}
+import { UserType, userTypeToString } from '../../utils/userType';
+import { useNavigate } from 'react-router-dom';
 
 interface User {
   id: number;
@@ -31,17 +28,7 @@ const UserPortal: React.FC = () => {
         userType: UserType.Common,
     });
     const [editingUserId, setEditingUserId] = useState<number | null>(null);
-
-    const userTypeToString = (userType: UserType): string => {
-        switch (userType) {
-          case UserType.Admin:
-            return 'Admin';
-          case UserType.Common:
-            return 'Common';
-          default:
-            return '';
-        }
-    };
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchUsers();
@@ -49,7 +36,6 @@ const UserPortal: React.FC = () => {
 
     const fetchUsers = async () => {
         const userList = await getUserList();
-        // const filteredUsers = Array.isArray(userList) ? userList.filter((user: User) => user.id === 1) : [];
         setUsers(userList);
     };
 
@@ -107,43 +93,59 @@ const UserPortal: React.FC = () => {
 
     const handleCreateUser = async () => {
         try {
-          await addUser(newUser);
-          setCreateShowAlert(true);
-          setTimeout(() => {
-            setCreateShowAlert(false);
-          }, 5000);
-          setShowCreateModal(false);
-          setNewUser({
-            firstName: '',
-            lastName: '',
-            email: '',
-            password: '',
-            userType: UserType.Common,
-          });
-          fetchUsers();
+            if (!newUser.firstName || !newUser.lastName || !newUser.email || !newUser.password) {
+                alert('Todos os campos são obrigatórios.');
+                return;
+            }
+            await addUser(newUser);
+            setCreateShowAlert(true);
+            setTimeout(() => {
+                setCreateShowAlert(false);
+            }, 5000);
+            setShowCreateModal(false);
+            setNewUser({
+                firstName: '',
+                lastName: '',
+                email: '',
+                password: '',
+                userType: UserType.Common,
+            });
+            fetchUsers();
         } catch (error) {
           console.error('Erro ao criar usuário:', error);
         }
     };
-    
+
+    const handleLogout = () => {
+        sessionStorage.removeItem('token');
+        navigate('/');
+    };
+
     return (
     <div>
-      <h2>User Portal</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+        <div>
+          <Button variant="danger" onClick={handleLogout}>
+            Logout
+          </Button>
+        </div>
+      </div>
       {showEditAlert && (
-        <Alert variant="success" onClose={() => setEditShowAlert(false)} dismissible>
+          <Alert variant="success" onClose={() => setEditShowAlert(false)} dismissible>
           Usuário editado com sucesso!
         </Alert>
       )}
       {showCreateAlert && (
-        <Alert variant="success" onClose={() => setCreateShowAlert(false)} dismissible>
+          <Alert variant="success" onClose={() => setCreateShowAlert(false)} dismissible>
           Usuário criado com sucesso!
         </Alert>
       )}
       {showDeleteAlert && (
-        <Alert variant="success" onClose={() => setDeleteShowAlert(false)} dismissible>
+          <Alert variant="success" onClose={() => setDeleteShowAlert(false)} dismissible>
           Usuário removido com sucesso!
         </Alert>
       )}
+      <h2>User Portal</h2>
       <Button variant="primary" onClick={() => setShowCreateModal(true)}>
         Create User
       </Button>
@@ -160,6 +162,7 @@ const UserPortal: React.FC = () => {
                 placeholder="Enter first name"
                 value={newUser.firstName}
                 onChange={(e) => setNewUser({ ...newUser, firstName: e.target.value })}
+                required
               />
             </Form.Group>
             <Form.Group controlId="formLastName">
@@ -169,6 +172,7 @@ const UserPortal: React.FC = () => {
                 placeholder="Enter last name"
                 value={newUser.lastName}
                 onChange={(e) => setNewUser({ ...newUser, lastName: e.target.value })}
+                required
               />
             </Form.Group>
             <Form.Group controlId="formEmail">
@@ -178,6 +182,7 @@ const UserPortal: React.FC = () => {
                 placeholder="Enter email"
                 value={newUser.email}
                 onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                required
               />
             </Form.Group>
             <Form.Group controlId="formPassword">
@@ -187,6 +192,7 @@ const UserPortal: React.FC = () => {
                 placeholder="Enter password"
                 value={newUser.password}
                 onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                required
               />
             </Form.Group>
             <Form.Group controlId="formUserType">
