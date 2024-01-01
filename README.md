@@ -101,7 +101,7 @@ npm install
 
 Inicie o aplicativo frontend.
 ```
-npm start
+npm run dev
 ```
 
 O frontend estará em execução em http://localhost:5173.
