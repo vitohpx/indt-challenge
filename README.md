@@ -146,7 +146,7 @@ DELETE
 /api/User/{id}
 ```
 
-Para experimentar toda a aplicação, siga os passo acima dessa etapa "DIFERENCIAL". 
+Para experimentar toda a aplicação, siga os passo antes dessa etapa "DIFERENCIAL". 
 
 
 ### Sobre o SISTEMA

@@ -14,8 +14,6 @@ services:
     build:
       context: ./backend/UserApi/
     environment:
-      ASPNETCORE_URLS: https://+:443
-      ASPNETCORE_HTTPS_PORT: 443
       DbServer: "sql-server"
       DbPort: "1433"
       DbUser: "sa"
@@ -23,7 +21,7 @@ services:
       Database: "UserDB"
     container_name: backend
     ports:
-      - "8443:443"
+      - "8080:80"
     depends_on:
       - sql-server
     networks:
