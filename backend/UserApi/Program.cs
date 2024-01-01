@@ -16,13 +16,19 @@ builder.Services.AddDbContext<UserDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy =>
+    var frontEndUrl = builder.Configuration["URL_FRONT"];
+    if (!string.IsNullOrEmpty(frontEndUrl))
     {
-        policy.WithOrigins(builder.Configuration["URL_FRONT"])
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
+        options.AddPolicy("AllowFrontEnd", policy =>
+        {
+            policy.WithOrigins(frontEndUrl)
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+        });
+    }
 });
+
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<UserService>();
 
@@ -51,7 +57,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.UseCors();
+app.UseCors("AllowFrontEnd");
 
 if (app.Environment.IsDevelopment())
 {

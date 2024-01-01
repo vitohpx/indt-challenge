@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+  sql-server:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    env_file:
+      - .env
+    container_name: sql-server
+    ports:
+      - "1433:1433"
+    networks:
+      - networkbridge
+  backend:
+    build:
+      context: ./backend/UserApi/
+    environment:
+      ASPNETCORE_URLS: https://+:443
+      ASPNETCORE_HTTPS_PORT: 443
+      DbServer: "sql-server"
+      DbPort: "1433"
+      DbUser: "sa"
+      Password: "Vitor@28"
+      Database: "UserDB"
+    container_name: backend
+    ports:
+      - "8443:443"
+    depends_on:
+      - sql-server
+    networks:
+      - networkbridge
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend
+    working_dir: /app
+    ports:
+      - "5173:5173"
+    command: sh -c "npm install && npm run dev"
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - backend
+    networks:
+      - networkbridge
+networks:
+  networkbridge:
+    driver: bridge
